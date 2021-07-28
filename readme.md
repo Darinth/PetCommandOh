@@ -7,8 +7,8 @@ This mod is free software: you can redistribute it and/or modify it under the te
 #### Introduction
 This mod will add a new PetOh menu to a variety of objects, giving you options similar to the standard Pet menu.
 
-####Details
-Following actions will be added.
+#### Details
+The following actions will be added.
 * Nearly everywhere in the world
   * PetOh > Follow: Will cause your pet to begin following you as if you were leading it. Uses the exact same code as leading in fact.
 * Tiles
