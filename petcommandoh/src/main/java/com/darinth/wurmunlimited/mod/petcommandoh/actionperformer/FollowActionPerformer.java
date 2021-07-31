@@ -170,4 +170,17 @@ public class FollowActionPerformer implements ModAction, ActionPerformer {
     public boolean action(Action action, Creature performer, Item source, int tilex, int tiley, boolean onSurface, int heightOffset, int tile, int dir, short num, float counter) {
         return this.action(performer);
     }
+
+    //
+    // Creatures
+    //
+    @Override
+    public boolean action(Action action, Creature performer, Item source, Creature target, short num, float counter) {
+        return this.action(performer);
+    }
+
+    @Override
+    public boolean action(Action action, Creature performer, Creature target, short num, float counter) {
+        return this.action(performer);
+    }
 }

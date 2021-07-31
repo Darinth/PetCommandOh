@@ -1,0 +1,1 @@
+cd "E:\SteamLibrary\steamapps\common\Wurm Unlimited Dedicated Server\" & WurmServerLauncher-patched.exe
