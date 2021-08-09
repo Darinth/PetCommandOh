@@ -17,6 +17,7 @@ import org.gotti.wurmunlimited.modsupport.actions.ActionPerformer;
 import org.gotti.wurmunlimited.modsupport.actions.ModAction;
 import org.gotti.wurmunlimited.modsupport.actions.ModActions;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AttackActionPerformer implements ModAction, ActionPerformer {
@@ -49,13 +50,15 @@ public class AttackActionPerformer implements ModAction, ActionPerformer {
         logger.info("Attack action");
         Communicator comm = performer.getCommunicator();
 
-        if(pet == null)
+        if(pet == null) {
             return true;
+        }
 
         if (DbCreatureStatus.getIsLoaded(pet.getWurmId()) == 1) {
             comm.sendNormalServerMessage("The " + performer.getPet().getName() + " tilts " + performer.getPet().getHisHerItsString() + " head while looking at you. There is a cage stopping " + performer.getPet().getHimHerItString() + " from attacking.", (byte)3);
             return true;
         }
+
 
         if (!pet.isWithinDistanceTo(performer.getPosX(), performer.getPosY(), performer.getPositionZ(), 200.0F, 0.0F)) {
             performer.getCommunicator().sendNormalServerMessage("The " + pet.getName() + " is too far away.");
@@ -84,6 +87,10 @@ public class AttackActionPerformer implements ModAction, ActionPerformer {
                         pet.getVisionArea().broadCastUpdateSelectBar(pet.getWurmId());
                     }
                 }
+
+                Order o = new Order(target.currentTile.tilex, target.currentTile.tiley, target.currentTile.getLayer());
+                pet.clearOrders();
+                pet.addOrder(o);
 
                 pet.setTarget(target.getWurmId(), true);
                 pet.attackTarget();

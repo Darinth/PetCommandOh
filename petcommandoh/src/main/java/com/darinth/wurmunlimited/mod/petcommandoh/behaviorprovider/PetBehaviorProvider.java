@@ -1,9 +1,6 @@
 package com.darinth.wurmunlimited.mod.petcommandoh.behaviorprovider;
 
-import com.darinth.wurmunlimited.mod.petcommandoh.actionperformer.AttackActionPerformer;
-import com.darinth.wurmunlimited.mod.petcommandoh.actionperformer.FollowActionPerformer;
-import com.darinth.wurmunlimited.mod.petcommandoh.actionperformer.MoveActionPerformer;
-import com.darinth.wurmunlimited.mod.petcommandoh.actionperformer.RedirectActionPerformer;
+import com.darinth.wurmunlimited.mod.petcommandoh.actionperformer.*;
 import com.wurmonline.mesh.Tiles;
 import com.wurmonline.server.behaviours.ActionEntry;
 import com.wurmonline.server.creatures.Creature;
@@ -30,19 +27,26 @@ public class PetBehaviorProvider implements ModAction, BehaviourProvider {
         MoveActionPerformer moveActionPerformer = new MoveActionPerformer();
         AttackActionPerformer attackActionPerformer = new AttackActionPerformer();
         RedirectActionPerformer redirectActionPerformer = new RedirectActionPerformer();
+        AttackMoveActionPerformer attackMoveActionPerformer = new AttackMoveActionPerformer(attackActionPerformer, moveActionPerformer);
+        LocateActionPerformer locateActionPerformer = new LocateActionPerformer();
 
         ModActions.registerBehaviourProvider(this);
         generalActionList = new LinkedList<ActionEntry>();
         generalActionList.add(followActionPerformer.actionEntry);
+        generalActionList.add(locateActionPerformer.actionEntry);
 
         tileActionList = new LinkedList<ActionEntry>();
         tileActionList.add(followActionPerformer.actionEntry);
         tileActionList.add(moveActionPerformer.actionEntry);
+        tileActionList.add(attackMoveActionPerformer.actionEntry);
+        tileActionList.add(locateActionPerformer.actionEntry);
 
         creatureActionList = new LinkedList<ActionEntry>();
         creatureActionList.add(followActionPerformer.actionEntry);
         creatureActionList.add(attackActionPerformer.actionEntry);
         creatureActionList.add(redirectActionPerformer.actionEntry);
+        creatureActionList.add(attackMoveActionPerformer.actionEntry);
+        creatureActionList.add(locateActionPerformer.actionEntry);
 
         generalActionList.add(0, new ActionEntry((short)-generalActionList.size(), "PetOh", ""));
         tileActionList.add(0, new ActionEntry((short)-tileActionList.size(), "PetOh", ""));
