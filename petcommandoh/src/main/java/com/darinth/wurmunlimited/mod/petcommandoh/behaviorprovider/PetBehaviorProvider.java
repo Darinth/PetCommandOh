@@ -18,87 +18,88 @@ import java.util.logging.Logger;
 
 public class PetBehaviorProvider implements ModAction, BehaviourProvider {
     private static Logger logger = Logger.getLogger(FollowActionPerformer.class.getName());
-    private LinkedList<ActionEntry> generalActionList;
-    private LinkedList<ActionEntry> tileActionList;
-    private LinkedList<ActionEntry> creatureActionList;
+    private FollowActionPerformer followActionPerformer;
+    private StatusActionPerformer statusActionPerformer;
+    private MoveActionPerformer moveActionPerformer;
+    private AttackActionPerformer attackActionPerformer;
+    private RedirectActionPerformer redirectActionPerformer;
+    private AttackMoveActionPerformer attackMoveActionPerformer;
+    private LocateActionPerformer locateActionPerformer;
 
     public PetBehaviorProvider()
     {
-        FollowActionPerformer followActionPerformer = new FollowActionPerformer();
-        StatusActionPerformer statusActionPerformer = new StatusActionPerformer();
-        MoveActionPerformer moveActionPerformer = new MoveActionPerformer();
-        AttackActionPerformer attackActionPerformer = new AttackActionPerformer();
-        RedirectActionPerformer redirectActionPerformer = new RedirectActionPerformer();
-        AttackMoveActionPerformer attackMoveActionPerformer = new AttackMoveActionPerformer(attackActionPerformer, moveActionPerformer);
-        LocateActionPerformer locateActionPerformer = new LocateActionPerformer();
+        followActionPerformer = new FollowActionPerformer();
+        statusActionPerformer = new StatusActionPerformer();
+        moveActionPerformer = new MoveActionPerformer();
+        attackActionPerformer = new AttackActionPerformer();
+        redirectActionPerformer = new RedirectActionPerformer();
+        attackMoveActionPerformer = new AttackMoveActionPerformer(attackActionPerformer, moveActionPerformer);
+        locateActionPerformer = new LocateActionPerformer();
 
         ModActions.registerBehaviourProvider(this);
-        generalActionList = new LinkedList<ActionEntry>();
-        generalActionList.add(followActionPerformer.actionEntry);
-        generalActionList.add(locateActionPerformer.actionEntry);
-        generalActionList.add(statusActionPerformer.actionEntry);
-        generalActionList.add(Actions.actionEntrys[41]);
-        generalActionList.add(Actions.actionEntrys[44]);
-
-        tileActionList = new LinkedList<ActionEntry>();
-        tileActionList.add(followActionPerformer.actionEntry);
-        tileActionList.add(moveActionPerformer.actionEntry);
-        tileActionList.add(attackMoveActionPerformer.actionEntry);
-        tileActionList.add(locateActionPerformer.actionEntry);
-        tileActionList.add(statusActionPerformer.actionEntry);
-        tileActionList.add(Actions.actionEntrys[41]);
-        tileActionList.add(Actions.actionEntrys[44]);
-
-        creatureActionList = new LinkedList<ActionEntry>();
-        creatureActionList.add(followActionPerformer.actionEntry);
-        creatureActionList.add(attackActionPerformer.actionEntry);
-        creatureActionList.add(redirectActionPerformer.actionEntry);
-        creatureActionList.add(attackMoveActionPerformer.actionEntry);
-        creatureActionList.add(locateActionPerformer.actionEntry);
-        creatureActionList.add(statusActionPerformer.actionEntry);
-        creatureActionList.add(Actions.actionEntrys[41]);
-        creatureActionList.add(Actions.actionEntrys[44]);
-
-
-        generalActionList.add(0, new ActionEntry((short)-generalActionList.size(), "PetOh", ""));
-        tileActionList.add(0, new ActionEntry((short)-tileActionList.size(), "PetOh", ""));
-        creatureActionList.add(0, new ActionEntry((short)-creatureActionList.size(), "PetOh", ""));
-    }
-
-    private void updateActionList(Creature performer, LinkedList<ActionEntry> actionList)
-    {
-        actionList.set(actionList.size()-1, performer.getPet().isStayonline() ? Actions.actionEntrys[45] : Actions.actionEntrys[44]);
-    }
-
-    private LinkedList<ActionEntry> getTileActionList(Creature performer)
-    {
-        updateActionList(performer, tileActionList);
-        return tileActionList;
     }
 
     private LinkedList<ActionEntry> getGeneralActionList(Creature performer)
     {
-        updateActionList(performer, generalActionList);
-        return generalActionList;
+        if(performer.getPet() == null)
+            return null;
+        LinkedList<ActionEntry> actionList = new LinkedList<ActionEntry>();
+        actionList.add(followActionPerformer.actionEntry);
+        actionList.add(locateActionPerformer.actionEntry);
+        actionList.add(statusActionPerformer.actionEntry);
+        actionList.add(Actions.actionEntrys[41]);
+        actionList.add(performer.getPet().isStayonline() ? Actions.actionEntrys[45] : Actions.actionEntrys[44]);
+        actionList.add(0, new ActionEntry((short)-actionList.size(), "PetOh", ""));
+        return actionList;
     }
 
-    private LinkedList<ActionEntry> getCreatureActionList(Creature performer)
+    private LinkedList<ActionEntry> getTileActionList(Creature performer)
     {
-        updateActionList(performer, creatureActionList);
-        return creatureActionList;
+        if(performer.getPet() == null)
+            return null;
+        LinkedList<ActionEntry> actionList = new LinkedList<ActionEntry>();
+        actionList.add(followActionPerformer.actionEntry);
+        actionList.add(moveActionPerformer.actionEntry);
+        actionList.add(attackMoveActionPerformer.actionEntry);
+        actionList.add(locateActionPerformer.actionEntry);
+        actionList.add(statusActionPerformer.actionEntry);
+        actionList.add(Actions.actionEntrys[41]);
+        actionList.add(performer.getPet().isStayonline() ? Actions.actionEntrys[45] : Actions.actionEntrys[44]);
+        actionList.add(0, new ActionEntry((short)-actionList.size(), "PetOh", ""));
+        return actionList;
+    }
+
+    private LinkedList<ActionEntry> getCreatureActionList(Creature performer, Creature target)
+    {
+        if(performer.getPet() == null)
+            return null;
+        LinkedList<ActionEntry> actionList = new LinkedList<ActionEntry>();
+        actionList.add(followActionPerformer.actionEntry);
+        if (!target.isInvulnerable())
+            actionList.add(attackActionPerformer.actionEntry);
+        actionList.add(redirectActionPerformer.actionEntry);
+        actionList.add(attackMoveActionPerformer.actionEntry);
+        actionList.add(locateActionPerformer.actionEntry);
+        actionList.add(statusActionPerformer.actionEntry);
+        actionList.add(Actions.actionEntrys[41]);
+        if (target.getAttitude(performer) != 2 && performer.getPower() <= 0)
+            actionList.add(Actions.actionEntrys[43]);
+        actionList.add(performer.getPet().isStayonline() ? Actions.actionEntrys[45] : Actions.actionEntrys[44]);
+        actionList.add(0, new ActionEntry((short)-actionList.size(), "PetOh", ""));
+        return actionList;
     }
 
     //
     // Tiles
     //
     public List<ActionEntry> getBehavioursFor(Creature performer, Item object, int tilex, int tiley, boolean onSurface, int tile) {
-        //logger.log(Level.INFO, String.format("tile source x/y %s %s %d/%d", performer.getName(), object.getActualName(), tilex, tiley));
-        return performer.getPet() == null ? null : getTileActionList(performer);
+        logger.log(Level.INFO, String.format("tile source x/y %s %s %d/%d", performer.getName(), object.getActualName(), tilex, tiley));
+        return getTileActionList(performer);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, int tilex, int tiley, boolean onSurface, int tile) {
-        //logger.log(Level.INFO, String.format("tile x/y %s %d/%d", performer.getName(), tilex, tiley));
-        return performer.getPet() == null ? null : getTileActionList(performer);
+        logger.log(Level.INFO, String.format("tile x/y %s %d/%d", performer.getName(), tilex, tiley));
+        return getTileActionList(performer);
     }
 
     //
@@ -106,23 +107,23 @@ public class PetBehaviorProvider implements ModAction, BehaviourProvider {
     //
     public List<ActionEntry> getBehavioursFor(Creature performer, Item object, int tilex, int tiley, boolean onSurface, int tile, int dir) {
         logger.log(Level.INFO, String.format("tile %s %d/%d %b %d %d", performer.getName(), tilex, tiley, onSurface, tile, dir));
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, int tilex, int tiley, boolean onSurface, int tile, int dir) {
         logger.log(Level.INFO, String.format("tile %s %d/%d %b %d %d", performer.getName(), tilex, tiley, onSurface, tile, dir));
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     //
     // Tiles border
     //
     public List<ActionEntry> getBehavioursFor(Creature performer, Item object, int tilex, int tiley, boolean onSurface, Tiles.TileBorderDirection dir, boolean border, int heightOffset) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, int tilex, int tiley, boolean onSurface, Tiles.TileBorderDirection dir, boolean border, int heightOffset) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     //
@@ -130,41 +131,41 @@ public class PetBehaviorProvider implements ModAction, BehaviourProvider {
     //
     @Deprecated
     public List<ActionEntry> getBehavioursFor(Creature performer, Item object, int tilex, int tiley, boolean onSurface, boolean corner, int tile) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, Item object, int tilex, int tiley, boolean onSurface, boolean corner, int tile, int heightOffset) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     @Deprecated
     public List<ActionEntry> getBehavioursFor(Creature performer, int tilex, int tiley, boolean onSurface, boolean corner, int tile) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, int tilex, int tiley, boolean onSurface, boolean corner, int tile, int heightOffset) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     //
     // Creatures
     //
     public List<ActionEntry> getBehavioursFor(Creature performer, Creature target) {
-        return performer.getPet() == null ? null : getCreatureActionList(performer);
+        return getCreatureActionList(performer, target);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, Item subject, Creature target) {
-        return performer.getPet() == null ? null : getCreatureActionList(performer);
+        return getCreatureActionList(performer, target);
     }
 
     //
     // Walls
     //
     public List<ActionEntry> getBehavioursFor(Creature performer, Item subject, Wall target) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 
     public List<ActionEntry> getBehavioursFor(Creature performer, Wall target) {
-        return performer.getPet() == null ? null : getGeneralActionList(performer);
+        return getGeneralActionList(performer);
     }
 }

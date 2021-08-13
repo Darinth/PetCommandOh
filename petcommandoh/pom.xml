@@ -6,7 +6,7 @@
 
     <groupId>com.darinth.wurmunlimited.mod.petcommandoh</groupId>
     <artifactId>petcommandoh</artifactId>
-    <version>0.1.1a</version>
+    <version>0.2.0a</version>
 
     <build>
         <plugins>
